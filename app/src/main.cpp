@@ -1,30 +1,46 @@
-#include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-#define SLEEP_TIME_MS 1000
-
-/* The devicetree node identifier for the "led0" alias. */
-#define LED_NODE DT_ALIAS(led0)
-
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
-
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
-int main(void)
-{
-    bool led_state = true;
+namespace {
+void t_low_fn() {
+  size_t count = 0;
+  while (true) {
+    LOG_INF("T_LOW running\t[count %d]", ++count);
+    k_msleep(300);
+  }
+}
 
-    if (!gpio_is_ready_dt(&led)) return 0;
+void t_med_fn() {
+  size_t count = 0;
+  while (true) {
+    LOG_INF("T_MED running\t[count %d]", ++count);
+    k_msleep(200);
+  }
+}
 
-    if (gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE) < 0) return 0;
+void t_high_fn() {
+  size_t count = 0;
+  while (true) {
+    LOG_INF("T_HIGH running\t[count %d]", ++count);
+    k_msleep(100);
+  }
+}
 
-    while (1) {
-        if (gpio_pin_toggle_dt(&led) < 0) return 0;
+const auto STACK_SIZE = 1024;
+const auto PRIO_LOW = 7;
+const auto PRIO_MED = 5;
+const auto PRIO_HIGH = 3;
 
-        led_state = !led_state;
-        LOG_INF("LED state: %s", led_state ? "ON" : "OFF");
-        k_msleep(SLEEP_TIME_MS);
-    }
-    return 0;
+// clang-format off
+K_THREAD_DEFINE(t_low,  STACK_SIZE, t_low_fn,  nullptr, nullptr, nullptr, PRIO_LOW,  0, 0);
+K_THREAD_DEFINE(t_med,  STACK_SIZE, t_med_fn,  nullptr, nullptr, nullptr, PRIO_MED,  0, 0);
+K_THREAD_DEFINE(t_high, STACK_SIZE, t_high_fn, nullptr, nullptr, nullptr, PRIO_HIGH, 0, 0);
+// clang-format on
+}  // namespace
+
+int main() {
+  LOG_INF("main() entered");
+  return 0;
 }
