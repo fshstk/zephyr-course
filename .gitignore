@@ -1,6 +1,2 @@
-# Build
-build
-
-# West files
-.west
-deps
+.env
+build/
