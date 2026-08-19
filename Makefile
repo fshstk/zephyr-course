@@ -5,7 +5,7 @@ build:
 	uv run west build app/
 
 pristine:
-	uv run west build --pristine app/
+	uv run west build app/ --pristine
 
 flash:
 	uv run west flash
