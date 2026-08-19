@@ -22,3 +22,7 @@ update:
 	uv run west update
 	uv run west packages pip | xargs uv pip install
 	uv run west zephyr-export
+
+run:
+	make pristine BOARD=native_sim
+	./build/zephyr/zephyr.exe
