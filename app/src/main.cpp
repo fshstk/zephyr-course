@@ -2,7 +2,7 @@
 #include <zephyr/logging/log.h>
 #include "fsh/Semaphore.h"
 
-LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
 
 namespace {
 size_t count = 0;
