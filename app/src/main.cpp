@@ -1,5 +1,6 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include "fsh/Mutex.h"
 #include "fsh/Semaphore.h"
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
@@ -7,11 +8,15 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
 namespace {
 size_t count = 0;
 fsh::Semaphore count_done;
+fsh::Mutex count_mutex;
 const size_t MAX_COUNT = 100'000;
 
 void increment() {
-  for (size_t i = 0; i < MAX_COUNT; ++i)
+  for (size_t i = 0; i < MAX_COUNT; ++i) {
+    count_mutex.lock();
     count++;
+    count_mutex.unlock();
+  }
   count_done.give();
   const auto* thread_name = k_thread_name_get(k_current_get());
   LOG_INF("[%s]: increment finished", thread_name);
